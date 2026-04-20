@@ -156,6 +156,22 @@
         ],
       ];
 
+      // Contexto global
+      const CalculatorContext = React.createContext();
+      const CalculatorProvider = ({ children }) => {
+        const [history, setHistory] = React.useState([]);
+
+        const updateHistory = (operation, parsedResult) => {
+          setHistory((prev) => [...prev, `${operation} = ${parsedResult}`]);
+        };
+
+        return (
+          <CalculatorContext.Provider value={{ history, updateHistory }}>
+            {children}
+          </CalculatorContext.Provider>
+        );
+      };
+
       // Componente display calculadora
       const CalculatorDisplay = ({ operation, result }) => {
         return (
@@ -186,25 +202,36 @@
 
       // Componente histórico de operações
       const OperationHistory = () => {
+        const { history } = React.useContext(CalculatorContext);
+
         return (
           <Card className={`py-10 px-8 w-full`}>
             <Text as="h1" className="mb-4" variant="heading">
               Histórico de operações
             </Text>
 
-            <ul className="flex flex-col gap-3">
-              <Text as="li">1 + 1 = 2</Text>
-              <Text as="li">2 + 3 + 1 = 6</Text>
-              <Text as="li">2 + 3 = 5</Text>
-            </ul>
+            {history.length > 0 ? (
+              <ul className="flex flex-col gap-3">
+                {history.map((history, index) => (
+                  <Text key={`item-${index}`} as="li">
+                    {history}
+                  </Text>
+                ))}
+              </ul>
+            ) : (
+              <Text as="p" variant="muted">
+                Nenhuma operação recente
+              </Text>
+            )}
           </Card>
         );
       };
 
-      // Componente calculadora
+      // Componente calculadora (Principal)
       const Calculator = () => {
         const [operation, setOperation] = React.useState(``);
         const [result, setResult] = React.useState(``);
+        const { updateHistory } = React.useContext(CalculatorContext);
 
         const handleInputClick = (input) => {
           if (input === "C") {
@@ -223,6 +250,7 @@
             const operationResult = eval(operation.replace(/,/g, "."));
             const parsedResult = operationResult.toString().replace(/\./g, ",");
             setResult(parsedResult);
+            updateHistory(operation, parsedResult);
             return;
           }
 
@@ -280,8 +308,10 @@
             gap-2
             `}
           >
-            <Calculator />
-            <OperationHistory />
+            <CalculatorProvider>
+              <Calculator />
+              <OperationHistory />
+            </CalculatorProvider>
           </main>
         );
       };

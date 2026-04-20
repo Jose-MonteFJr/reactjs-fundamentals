@@ -26,6 +26,8 @@ Hooks complementares: `useRef`, `useMemo`, `useCallback`, `useReducer`, `useTran
 
 O `useState` é um Hook do React que permite gerenciar o estado dentro de um componente funcional.
 
+- São objetos ou variáveis especiais que armazenam dados dinâmicos de um componente
+
 - Ele armazena um valor e fornece uma função para atualizá-lo, garantindo que o React saiba quando re-renderizar o componente.
 
 - Você pode transportar valores das `props` para um estado e então eles serão mutáveis.
@@ -174,6 +176,97 @@ Podemos fazer um mix dos eventos com o método `filter` para listar apenas os no
                     <li key={`${index}-${name}`}>{name}</li>
                     ))
                 }
+            </ul>
+            </div>
+        );
+        }
+
+## React Hooks: API de contexto
+
+A **Context API (ou store)** permite **compartilhar estados e funções** entre componentes **sem precisar passar props manualmente** de um componente para outro.
+
+Utilizado quando precisa passar dados de filho para pai, ou em componentes em paralelo.
+
+- Utilizar quando você tem vários componentes que precisam acessar o mesmo dado, como um **tema escuro/claro**, **usuário logado**, ou **configurações globais**.
+
+- Sem Context API, seria necessário passar informações como props, de pai para filho, o que seria um **problema ao escalar**.
+
+- Com Context API, criamos um **contexto (Context)** e um **"provedor" (Provider)** que pode ser acessado por qualquer componente na árvore.
+
+### Características 
+
+- Pode ter **múltiplos componentes de Context API** - eles não precisam necessariamente estarem disponíveis para a aplicação toda.
+
+- Para utilizar dentro dos componentes, a Context API precisa estar como um **"wrapper"** deles.
+
+- Os estados globais também utilizam o hool `useState` (ou outros hooks necessários).
+
+- O React fornece duas funções para a criação e utilização: `createContext` e `useContext`
+
+### Erros ao utilizar Context API
+
+- Não utilize Context API para estados simples, nesses casos utilize `useState`, usar Context nesse caso pode ser um "overkill", `useState` estados locais, `Context API` estados globais.
+
+- Performance: Usar apenas a Context API pode causar renders desnecessários na árvore.
+
+### Como utilizar Context API
+
+### 1. Criando o componente do contexto
+
+        const CounterContext = React.createContext();
+
+        function CounterProvider({ children }) {
+        const [savedCounts, setSavedCounts] = React.useState([]);
+
+        function saveCount(count) {
+            setSavedCounts((prev) => [...prev, count]);
+        }
+
+        return (
+            <CounterContext.Provider value={{ savedCounts, saveCount }}>
+            {children}
+            </CounterContext.Provider>
+        );
+        }
+
+### 2. Integrar o contexto como um "wrapper"
+
+        function App() {
+        return (
+            <CounterProvider>
+            <Counter />
+            <CounterList />
+            </CounterProvider>
+        );
+        }
+
+### 3. Utilizar o contexto para `salvar` dados
+
+        function Counter() {
+        const [count, setCount] = useState(0);
+        const { saveCount } = React.useContext(CounterContext);
+
+        return (
+            <div>
+            <h2>Contador: {count}</h2>
+            <button onClick={() => setCount(count + 1)}>Incrementar</button>
+            <button onClick={() => saveCount(count)}>Salvar</button>
+            </div>
+        );
+        }
+
+### 4. Utilizar o contexto para `ler` os dados
+
+        function CounterList() {
+        const { savedCounts } = React.useContext(CounterContext);
+
+        return (
+            <div>
+            <h2>Valores Salvos</h2>
+            <ul>
+                {savedCounts.map((value, index) => (
+                <li key={index}>{value}</li>
+                ))}
             </ul>
             </div>
         );
