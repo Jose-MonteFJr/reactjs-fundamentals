@@ -379,3 +379,37 @@ O segundo parâmetro do `useEffect` define **quando** o efeito deve ser executad
             React.useEffect(() => {
             console.log("Count ou Name mudou!");
             }, [count, name]); // Executa quando 'count' ou 'name' mudar.
+
+## React Hooks: Custom
+
+Um **custom hook** é uma função do JavaScript que encapsula lógica dentro do contexto do React.
+
+Ele funciona como um hook nativo do React (`useState`, `useEffect` e etc.) mas é criado pelo dev para atender um caso de uso específico, tornando o código organizado, reutilizável e fácil de manter e testar.
+
+> Um custom hook é qualquer componente funcional fora do React, podem ser de bibliotecas como React Hook Form, React Query ou seus próprios.
+>
+> Lembrando que por boa práticas o custom hook deve começar com "use".
+
+### O que fazer em um custom hook
+
+- Utilizar outros hooks do React como estados, efeitos e outros.
+
+- Também outros hooks "third-parties" (bibliotecas instaladas).
+
+- Fazer requisições de API e criar diferentes estados, como carregamento, resposta, erros e etc.
+
+- Enviar dados para API e retornar uma informação para o usuário
+
+- Manipular e/ou validar dados enviados e/ou recebidos de APIs
+
+- Encapsular lógica de negócio necessária no frontend
+
+- Encapsular o `useContext` diretamente no hook
+
+### O que evitar 
+
+- Criar o evento do componente direto. O melhor é criar uma função e um evento a executa.
+
+- Criar e retornar estados específicos para renderização de elementos.
+
+- Se o caso de uso for muito específico, talvez não precise de um custom hook, mas de um componente 
