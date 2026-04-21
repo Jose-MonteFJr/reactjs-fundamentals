@@ -271,3 +271,111 @@ Utilizado quando precisa passar dados de filho para pai, ou em componentes em pa
             </div>
         );
         }
+
+## React Hooks: Efeitos
+
+No React, todos os componentes têm um **ciclo de vida (ou efeitos colaterais)**, que são os momentos em que eles: 
+
+- ### Construído (mount)
+
+    - Ocorre quando o componente aparece na tela pela primeira vez, podemos executar ações iniciais, como buscar dados de uma API ou adicionar eventos através do `addEventListener`.
+
+- ### Atualizam (update)
+
+    - Quando seu estado ou props mudam.
+
+- ### Desmontam (unmount)
+
+    - Quando saem da tela ou são removidos do DOM.
+
+> Os ciclos de vida são fundamentais para entender quando e como o React deve atualizar um componente, executar efeitos colaterais, ou limpar recursos.
+
+### Exemplos
+
+- Manipular o DOM (exemplo: alterar o título da página).
+
+- Atualizar estados quando uma propriedade for alterada.
+
+- Fazer requisições HTTP (exemplo: buscar dados de uma API).
+
+- Gerenciar timers (exemplo: `setTimeOut` ou `setInterval`).
+
+- Subscrever eventos (exemplo: `addEventListener`).
+
+- Lidar com WebSockets, LocalStorage e outras integrações externas.
+
+- Atualizar estrutura de campos de formulário quando um outro campo for alterado.
+
+### Como utilizar `useEffect`
+
+O `useEffect` é um hook do React usado para lidar com efeitos colaterais em componentes funcionais. Por conta da sua escrita, ele parece difícil, mas é simples.
+
+Essa função conta com **dois parâmetros obrigatórios**.
+
+- ### Primeiro parâmetro: Função de callback
+
+No primeiro parâmetro o `useEffect` recebe uma **função anônima** responsável por ser executada quando o efeito for ativado (callback), essa é a função do `mount` e `update`.
+
+    React.useEffect(() => {
+    // Código do efeito (executado quando necessário)
+    });
+
+
+ - ### Opcional: Função de retorno
+
+ Ao retornar outra função anônima dentro do callback o componente a executa quando ele é destruído, essa é a função do `unmount`
+
+    React.useEffect(() => {
+    // Código do efeito (executado quando necessário)
+
+    return () => {
+        // Código de limpeza 
+        // (executado antes de refazer o efeito ou desmontar)
+    };
+    });
+
+
+- ### Casos de uso
+
+    - Executar o `removeEventListener` para não acumular eventos sem o componente existir
+
+    - Limpar intervalos de `setTimeOut` ou `setInterval`
+
+    - Cancelar requisições em progresso com o `AbortController`
+
+    - Desconectar de WebSockets ou Streams
+
+---
+
+- ### Segundo parâmetro: Lista de dependências
+
+O segundo parâmetro do `useEffect` define **quando** o efeito deve ser executado. Obrigatoriamente deve ser uma lista (array) com ou sem elementos.
+
+> ⚠️ Criar um novo efeito sem nenhuma dependência poderá causar loop infinito de renderização. Sempre passe uma dependência.
+
+- ### Lista vazia - sem dependências 
+
+    - Executa **somente uma vez**, quando o componente **monta**.
+
+    - Útil para buscas iniciais de dados ou eventos globais.
+
+            React.useEffect(() => {
+            console.log("Executa apenas no mount!");
+            }, []);
+        
+- ### `[dep1, dep2]`  Lista preenchida - com uma ou mais dependências
+
+    - Executa quando qualquer uma das variáveis no array mudar.
+
+    - Em quase todos os casos essas variáveis são props ou estados.
+
+            const [count, setCount] = React.useState(0);
+            const [name, setName] = React.useState("");
+
+            React.useEffect(() => {
+            console.log(`Count atualizado: ${count}`);
+            }, [count]); // Executa quando 'count' mudar.
+
+            React.useEffect(() => {
+            console.log("Count ou Name mudou!");
+            }, [count, name]); // Executa quando 'count' ou 'name' mudar.
